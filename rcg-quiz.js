@@ -189,7 +189,7 @@
                     <p class="rcg-screen-sub">To ensure your projection is calibrated to your context, please provide
                         your sector details.</p>
 
-                    <div style="max-width: 600px;">
+                    <div style="width: 100%;">
                         <div class="rcg-cal-section" style="margin-bottom: 32px;">
                             <div class="rcg-cal-label" style="font-weight: 700; color: #fff; margin-bottom: 12px;">
                                 Professional Role</div>
@@ -287,6 +287,9 @@
                         <div class="rcg-spinner"
                             style="border: 4px solid #2d2d3f; border-top-color: #ef4444; width: 100%; height: 100%; border-radius: 50%; animation: rcgSpin 1s linear infinite;">
                         </div>
+                        <div class="rcg-spinner-pulse"
+                            style="position:absolute;inset:0;border-radius:50%;animation:rcgPulse 1.5s ease-in-out infinite;">
+                        </div>
                     </div>
                     <h2 class="rcg-screen-title rcg-serif" style="font-size: 32px; margin-bottom: 12px;">Analysing
                         Response Patterns...</h2>
@@ -296,11 +299,11 @@
                     <div style="text-align: left; max-width: 320px; margin: 0 auto;">
                         <ul class="rcg-load-checklist" id="load-list" style="list-style: none; padding: 0;">
                             <li class="rcg-load-item" id="li-1"
-                                style="display: flex; align-items: center; gap: 12px; color: #8b8ba0; font-size: 15px; margin-bottom: 16px;">
+                                style="display: flex; align-items: center; gap: 12px; color: #8b8ba0; font-size: 15px; margin-bottom: 16px; opacity: 0; transform: translateX(-10px); transition: opacity 0.4s ease, transform 0.4s ease;">
                                 <span class="rcg-li-icon"
-                                    style="display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #2d2d3f;">
+                                    style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: rgba(239,68,68,0.15); border: 1.5px solid #ef4444; flex-shrink:0;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        viewBox="0 0 24 24" stroke="#ef4444">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                             d="M5 13l4 4L19 7" />
                                     </svg>
@@ -308,16 +311,28 @@
                                 Evaluating Pressure Thresholds...
                             </li>
                             <li class="rcg-load-item" id="li-2"
-                                style="display: flex; align-items: center; gap: 12px; color: #8b8ba0; font-size: 15px; margin-bottom: 16px;">
+                                style="display: flex; align-items: center; gap: 12px; color: #8b8ba0; font-size: 15px; margin-bottom: 16px; opacity: 0; transform: translateX(-10px); transition: opacity 0.4s ease, transform 0.4s ease;">
                                 <span class="rcg-li-icon"
-                                    style="display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #2d2d3f;">
+                                    style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: rgba(239,68,68,0.15); border: 1.5px solid #ef4444; flex-shrink:0;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        viewBox="0 0 24 24" stroke="#ef4444">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                             d="M5 13l4 4L19 7" />
                                     </svg>
                                 </span>
                                 Calculating Potential Impact...
+                            </li>
+                            <li class="rcg-load-item" id="li-3"
+                                style="display: flex; align-items: center; gap: 12px; color: #8b8ba0; font-size: 15px; margin-bottom: 16px; opacity: 0; transform: translateX(-10px); transition: opacity 0.4s ease, transform 0.4s ease;">
+                                <span class="rcg-li-icon"
+                                    style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: rgba(239,68,68,0.15); border: 1.5px solid #ef4444; flex-shrink:0;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none"
+                                        viewBox="0 0 24 24" stroke="#ef4444">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </span>
+                                Generating Your Report...
                             </li>
                         </ul>
                     </div>
@@ -453,7 +468,7 @@
 
                         <div style="display: flex; flex-direction: column; gap: 16px; align-items: center;">
                             <button class="rcg-btn-primary" onclick="book()"
-                                style="width: 100%; max-width: 400px; justify-content: center; background: #990000; border: none;">
+                                style="width: 100%; max-width: 400px; display:flex; align-items:center; justify-content: center; gap:8px; background: #990000; border: none;">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -462,13 +477,13 @@
                                 Request Training Proposal for Your Team
                             </button>
                             <button class="rcg-btn-secondary" onclick="methodology()"
-                                style="width: 100%; max-width: 400px; justify-content: center; border-color: #2d2d3f; color: #fff;">
+                                style="width: 100%; max-width: 400px; display:flex; align-items:center; justify-content: center; gap:8px; border-color: #2d2d3f; color: #fff;">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                 </svg>
-                                Our Internal Scoring Methodology
+                                Learn About Our Methodology
                             </button>
                         </div>
 
@@ -478,23 +493,15 @@
 
                         <div
                             style="margin-top: 48px; border-top: 1px solid #2d2d3f; padding-top: 24px; display: flex; justify-content: center; gap: 24px; color: #8b8ba0; font-size: 13px;">
-                            <span onclick="retake()"
-                                style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                            <button onclick="retake()"
+                                style="cursor: pointer; display: flex; align-items: center; gap: 6px; background: transparent; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 10px 20px; color: #8b8ba0; font-size: 13px; font-weight: 600; transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#8b8ba0'">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                 </svg>
                                 Retake Audit
-                            </span>
-                            <span style="display: flex; align-items: center; gap: 6px;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                                </svg>
-                                Share This Assessment
-                            </span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -603,7 +610,7 @@
                     </div>
                     <span class="rcg-option-text">${opt}</span>
                 `;
-            btn.onclick = () => { answers[curQ] = { i, score: q.scores[i] }; renderQ(); };
+            btn.onclick = () => { answers[curQ] = { i, score: q.scores[i] }; renderQ(); setTimeout(() => nextQ(), 350); };
             container.appendChild(btn);
         });
 
@@ -617,15 +624,22 @@
     }
 
     window.nextQ = function () { if (curQ < QS.length - 1) { curQ++; renderQ(); } else finishQuiz(); };
-    window.prevQ = function () { if (curQ > 0) { curQ--; renderQ(); } };
+    window.prevQ = function () { if (curQ > 0) { curQ--; renderQ(); } else { go('rcg-calibration'); } };
 
     function finishQuiz() {
         go('rcg-loading');
-        setTimeout(() => document.getElementById('li-1').classList.add('show'), 600);
-        setTimeout(() => document.getElementById('li-2').classList.add('show'), 1200);
+        function showLi(id, delay) {
+            setTimeout(() => {
+                const el = document.getElementById(id);
+                if (el) { el.style.opacity = '1'; el.style.transform = 'translateX(0)'; }
+            }, delay);
+        }
+        showLi('li-1', 600);
+        showLi('li-2', 1300);
+        showLi('li-3', 2000);
         const total = answers.reduce((s, a) => s + (a?.score || 0), 0);
         sendWebhook(total);
-        setTimeout(() => showResults(total), 2800);
+        setTimeout(() => showResults(total), 2900);
     }
 
     function showResults(total) {
@@ -677,8 +691,8 @@
         fetch(CFG.WEBHOOK, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' } });
     }
 
-    window.book = function () { window.open(CFG.BOOK_URL, '_blank'); };
-    window.methodology = function () { toggleModal('calc-modal', true); };
+    window.book = function () { window.location.href = '/contact'; };
+    window.methodology = function () { window.location.href = '/methodology-2'; };
     window.retake = function () { location.reload(); };
 
     // Listen for Webflow Triggers
