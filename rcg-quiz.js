@@ -1,7 +1,8 @@
 (function () {
     const CFG = {
         WEBHOOK: 'https://hook.eu2.make.com/YOUR_WEBHOOK_ID',
-        BOOK_URL: 'https://yoursite.com/book'
+        BOOK_URL: '/contact',
+        LOOPS_API_KEY: '77b1203684adef8831e2d5e7b6230ed1'  // 🔑 Replace with your Loops.so API key
     };
 
     const PROFILES = [
@@ -687,8 +688,36 @@
 
     function sendWebhook(total) {
         const payload = { ...user, score: total, timestamp: new Date().toISOString() };
-        if (CFG.WEBHOOK.includes('YOUR_WEBHOOK')) { console.log('Payload:', payload); return; }
-        fetch(CFG.WEBHOOK, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' } });
+
+        // ── Send to Make/Zapier webhook (optional) ──
+        if (!CFG.WEBHOOK.includes('YOUR_WEBHOOK')) {
+            fetch(CFG.WEBHOOK, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' } });
+        }
+
+        // ── Send to Loops.so ──
+        if (!CFG.LOOPS_API_KEY.includes('YOUR_LOOPS')) {
+            const overall = Math.round((total / 21) * 5 * 10) / 10;
+            fetch('https://app.loops.so/api/v1/contacts/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + CFG.LOOPS_API_KEY
+                },
+                body: JSON.stringify({
+                    email: user.email,
+                    firstName: user.name,
+                    source: 'RCG Negotiation Quiz',
+                    subscribed: true,
+                    // Custom properties (must be created in Loops.so dashboard first)
+                    quizScore: overall,
+                    quizContext: user.context || '',
+                    quizRole: user.role || '',
+                    quizGDV: user.gdv || ''
+                })
+            }).then(r => r.json()).then(d => console.log('Loops.so:', d)).catch(console.error);
+        } else {
+            console.log('Loops.so payload (dev):', payload);
+        }
     }
 
     window.book = function () { window.location.href = '/contact'; };
