@@ -627,7 +627,7 @@
     window.nextQ = function () { if (curQ < QS.length - 1) { curQ++; renderQ(); } else finishQuiz(); };
     window.prevQ = function () { if (curQ > 0) { curQ--; renderQ(); } else { go('rcg-calibration'); } };
 
-    function finishQuiz() {
+    async function finishQuiz() {
         go('rcg-loading');
         function showLi(id, delay) {
             setTimeout(() => {
@@ -639,8 +639,15 @@
         showLi('li-2', 1300);
         showLi('li-3', 2000);
         const total = answers.reduce((s, a) => s + (a?.score || 0), 0);
-        sendWebhook(total);
-        setTimeout(() => showResults(total), 2900);
+
+        // Wait for both the minimum animation time (2900ms) and the webhook API calls to finish
+        // This ensures the email is sent/triggered while the loading screen is active.
+        await Promise.all([
+            new Promise(resolve => setTimeout(resolve, 2900)),
+            sendWebhook(total)
+        ]);
+
+        showResults(total);
     }
 
     function showResults(total) {
@@ -686,18 +693,24 @@
         setTimeout(() => { document.querySelectorAll('.rcg-comp-fill').forEach(f => f.style.width = f.dataset.pct + '%'); }, 100);
     }
 
-    function sendWebhook(total) {
+    async function sendWebhook(total) {
         const payload = { ...user, score: total, timestamp: new Date().toISOString() };
+        const promises = [];
 
         // ── Send to Make/Zapier webhook (optional) ──
         if (!CFG.WEBHOOK.includes('YOUR_WEBHOOK')) {
-            fetch(CFG.WEBHOOK, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' } });
+            promises.push(
+                fetch(CFG.WEBHOOK, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' } })
+                    .catch(console.error)
+            );
         }
 
         // ── Send to Loops.so ──
         if (!CFG.LOOPS_API_KEY.includes('YOUR_LOOPS')) {
             const overall = Math.round((total / 21) * 5 * 10) / 10;
-            fetch('https://app.loops.so/api/v1/contacts/create', {
+
+            // First we update/create the contact
+            const updateContact = fetch('https://app.loops.so/api/v1/contacts/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -714,10 +727,32 @@
                     quizRole: user.role || '',
                     quizGDV: user.gdv || ''
                 })
-            }).then(r => r.json()).then(d => console.log('Loops.so:', d)).catch(console.error);
+            }).then(r => r.json()).then(d => console.log('Loops.so Contact:', d)).catch(console.error);
+
+            // Then we send a custom event to trigger an email workflow/journey in Loops naturally
+            const sendEvent = fetch('https://app.loops.so/api/v1/events/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + CFG.LOOPS_API_KEY
+                },
+                body: JSON.stringify({
+                    email: user.email,
+                    eventName: 'quiz_completed', // Trigger an email inside Loops using this event name
+                    quizScore: overall,
+                    firstName: user.name,
+                    quizContext: user.context || '',
+                    quizRole: user.role || '',
+                    quizGDV: user.gdv || ''
+                })
+            }).then(r => r.json()).then(d => console.log('Loops.so Event:', d)).catch(console.error);
+
+            promises.push(Promise.all([updateContact, sendEvent]));
         } else {
             console.log('Loops.so payload (dev):', payload);
         }
+
+        await Promise.all(promises);
     }
 
     window.book = function () { window.location.href = '/contact'; };
@@ -741,11 +776,32 @@
         const cc = document.getElementById('calc-content-container');
         if (cc) {
             cc.innerHTML = `
-                    <div class="tier-box t1"><div class="tier-num">1</div><div><div class="tier-h">Critical Risk</div><div class="tier-p">Reactive, emotion-driven patterns.</div></div></div>
-                    <div class="tier-box t2"><div class="tier-num">2</div><div><div class="tier-h">High Risk</div><div class="tier-p">Struggles under sustained pressure.</div></div></div>
-                    <div class="tier-box t3"><div class="tier-num">3</div><div><div class="tier-h">Moderate</div><div class="tier-p">Adequate composure, some tactical gaps.</div></div></div>
-                    <div class="tier-box t4"><div class="tier-num">4</div><div><div class="tier-h">Competent</div><div class="tier-p">Strong emotional regulation.</div></div></div>
-                    <div class="tier-box t5"><div class="tier-num">5</div><div><div class="tier-h">Mastery</div><div class="tier-p">Elite-level negotiation composure.</div></div></div>
+                    <div class="calc-disclaimer">
+                        <p><strong>Important Disclaimer:</strong> All scores, projections, and risk assessments in this audit are based on our proprietary internal scoring methodology developed by Red Centre Global. These are assumptions designed to provide directional insights, not verified financial advice or guarantees.</p>
+                    </div>
+
+                    <div class="calc-section-title">Assessment Methodology</div>
+                    <p class="calc-section-body">Each scenario is designed by our team with experience in high-stakes negotiations. Your responses are scored on a 1–5 scale based on our internal evaluation framework for emotional regulation under pressure.</p>
+
+                    <div class="tier-box t1"><div class="tier-num">1</div><div><div class="tier-h">Critical Risk (Our Assessment)</div><div class="tier-p">Responses that may indicate reactive, emotion-driven patterns according to our framework.</div></div></div>
+                    <div class="tier-box t2"><div class="tier-num">2</div><div><div class="tier-h">High Risk (Our Assessment)</div><div class="tier-p">Partially controlled responses that may still be vulnerable to pressure tactics in our view.</div></div></div>
+                    <div class="tier-box t3"><div class="tier-num">3</div><div><div class="tier-h">Moderate (Our Assessment)</div><div class="tier-p">Adequate composure but potentially lacking tactical sophistication based on our criteria.</div></div></div>
+                    <div class="tier-box t4"><div class="tier-num">4</div><div><div class="tier-h">Competent (Our Assessment)</div><div class="tier-p">Strong emotional regulation with tactical awareness according to our framework.</div></div></div>
+                    <div class="tier-box t5"><div class="tier-num">5</div><div><div class="tier-h">Mastery (Our Assessment)</div><div class="tier-p">Elite-level composure based on our internal criteria for optimal negotiation responses.</div></div></div>
+
+                    <div class="calc-section-title" style="margin-top:24px;">Estimated Financial Impact Calculation</div>
+                    <p class="calc-section-body"><strong>This is an assumption-based projection only.</strong> Your estimated margin impact is calculated using our proprietary leakage formula: we apply an assumed percentage (ranging from 0.2% to 4.0% based on your score profile) to your stated annual transaction volume.</p>
+                    <p class="calc-section-body"><strong>Important:</strong> This figure represents our theoretical assessment of potential value erosion and should not be treated as financial fact. Actual results will vary significantly based on market conditions, team expertise, and countless other factors not captured in this brief assessment.</p>
+
+                    <div class="calc-use-box">
+                        <span class="calc-use-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Use This Data Responsibly
+                        </span>
+                        <p class="calc-section-body" style="margin:8px 0 0;">This audit is designed as a conversation-starter and self-reflection tool. All results are based on Red Centre Global's internal assumptions and should be independently verified before making any business decisions.</p>
+                    </div>
                 `;
         }
         updateSlider(10);
